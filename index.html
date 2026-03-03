@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indie Protocol — The Economic Layer for Digital Services</title>
+  <meta name="description" content="A general-purpose smart contract framework for service tokenization, marketplace, and billing. Executor-agnostic. Creator-first. Gasless by default.">
+  <meta property="og:title" content="Indie Protocol — The Economic Layer for Digital Services">
+  <meta property="og:description" content="Tokenize any service. Three billing models. Zero commission on service revenue. Built on Base.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    /* ═══ CUSTOM PROPERTIES ═══ */
+    :root {
+      --bg: #0f172a;
+      --bg-footer: #020617;
+      --teal: #218178;
+      --teal-light: #4bc0b5;
+      --teal-hover: #1a665f;
+      --teal-shadow: rgba(33,129,120,0.3);
+      --teal-border: rgba(33,129,120,0.3);
+      --white: #fff;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --surface: rgba(255,255,255,0.05);
+      --surface-hover: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.1);
+      --border-hover: rgba(255,255,255,0.2);
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --max-w: 80rem;
+      --px: 1rem;
+      --radius-sm: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-full: 9999px;
+      --ease: cubic-bezier(0.22,1,0.36,1);
+    }
+
+    /* ═══ RESET ═══ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scroll-padding-top:5rem}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--white);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+
+    /* ═══ TYPOGRAPHY ═══ */
+    h1,h2,h3,h4{font-family:var(--font-display);font-weight:800;line-height:1.1;letter-spacing:-0.025em}
+    h1{font-size:2.5rem}
+    h2{font-size:2rem;margin-bottom:1rem}
+    h3{font-size:1.25rem;margin-bottom:0.25rem}
+    .gradient-text{background:linear-gradient(135deg,var(--teal),var(--teal-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .text-secondary{color:var(--slate-300)}
+    .text-muted{color:var(--slate-400)}
+    .text-body{font-size:1.125rem;color:var(--slate-300);line-height:1.75;max-width:42rem}
+    .section-sub{font-size:1.125rem;color:var(--slate-400);max-width:40rem;margin:0 auto 2.5rem;line-height:1.7}
+
+    /* ═══ LAYOUT ═══ */
+    .container{max-width:var(--max-w);margin:0 auto;padding:0 var(--px)}
+    section{padding:4rem 0}
+    .text-center{text-align:center}
+    .mx-auto{margin-left:auto;margin-right:auto}
+    .grid-2{display:grid;grid-template-columns:1fr;gap:1.5rem}
+    .grid-3{display:grid;grid-template-columns:1fr;gap:1.5rem}
+    .split{display:grid;grid-template-columns:1fr;gap:3rem;align-items:center}
+    .flex-center{display:flex;align-items:center;justify-content:center}
+
+    /* ═══ PILL ═══ */
+    .pill{display:inline-flex;align-items:center;gap:0.5rem;padding:0.3rem 0.85rem;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--surface);font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-300);margin-bottom:1.25rem}
+    .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--teal-light);flex-shrink:0}
+
+    /* ═══ CARD ═══ */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.75rem;transition:all 0.3s ease}
+    .card:hover{border-color:var(--teal-border);transform:translateY(-4px)}
+    .card-icon{width:2.75rem;height:2.75rem;display:flex;align-items:center;justify-content:center;background:rgba(33,129,120,0.12);border-radius:var(--radius-lg);color:var(--teal-light);margin-bottom:0.75rem}
+    .card-icon svg{width:1.25rem;height:1.25rem}
+    .card-tag{font-size:0.7rem;color:var(--teal-light);font-weight:600;letter-spacing:0.02em}
+    .card p{color:var(--slate-400);font-size:0.875rem;margin-top:0.5rem;line-height:1.6}
+
+    /* ═══ BUTTONS ═══ */
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;font-weight:700;cursor:pointer;transition:all 0.3s ease;font-family:var(--font-display);border:none;text-decoration:none}
+    .btn-primary{background:var(--teal);color:var(--white);padding:0.85rem 1.75rem;border-radius:var(--radius-lg);box-shadow:0 10px 15px -3px var(--teal-shadow);font-size:1rem}
+    .btn-primary:hover{background:var(--teal-hover);transform:translateY(-2px)}
+    .btn-ghost{background:transparent;color:var(--slate-300);padding:0.85rem 1.75rem;border-radius:var(--radius-lg);border:1px solid var(--border-hover);font-size:1rem}
+    .btn-ghost:hover{background:var(--surface);color:var(--white)}
+    .btn-sm{padding:0.45rem 1rem;font-size:0.8rem}
+    .hero-ctas{display:flex;flex-direction:column;gap:0.75rem;margin-top:2rem}
+
+    /* ═══ NAVBAR ═══ */
+    #navbar{position:fixed;top:0;width:100%;z-index:50;transition:all 0.3s ease;background:transparent}
+    #navbar.scrolled{background:rgba(15,23,42,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}
+    .nav-inner{display:flex;justify-content:space-between;align-items:center;height:4rem}
+    .nav-logo{font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:-0.03em;color:var(--white)}
+    .nav-links{display:none;gap:1.75rem}
+    .nav-links a{font-size:0.8rem;font-weight:500;color:var(--slate-400);transition:color 0.2s}
+    .nav-links a:hover{color:var(--white)}
+    .nav-cta-desktop{display:none}
+    .mobile-menu-btn{display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;color:var(--slate-300)}
+    .mobile-menu-btn svg{width:1.25rem;height:1.25rem}
+    .mobile-menu{display:none;position:absolute;top:4rem;left:0;right:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:1rem var(--px)}
+    .mobile-menu.open{display:flex;flex-direction:column;gap:0.5rem}
+    .mobile-menu a{padding:0.75rem 0;font-size:0.9rem;color:var(--slate-300);border-bottom:1px solid var(--border)}
+    .mobile-menu a:last-child{border-bottom:none}
+
+    /* ═══ HERO ═══ */
+    #hero{position:relative;padding:8rem 0 4rem;overflow:hidden;min-height:90vh;display:flex;align-items:center}
+    .bg-blueprint{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(100,116,139,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(100,116,139,0.08) 1px,transparent 1px);background-size:40px 40px}
+    .bg-noise{position:absolute;inset:0;pointer-events:none;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px 256px}
+    .bg-glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(33,129,120,0.12) 0%,transparent 70%);pointer-events:none}
+    .hero-content{position:relative;z-index:2}
+    .hero-sub{font-size:1.1rem;color:var(--slate-300);max-width:36rem;line-height:1.7;margin-top:1.25rem}
+
+    /* ═══ STATS BAR ═══ */
+    .stats-bar{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+    .stat{text-align:center;padding:0.5rem}
+    .stat-value{font-family:var(--font-display);font-weight:800;font-size:1.35rem;color:var(--white)}
+    .stat-label{font-size:0.7rem;color:var(--slate-400);margin-top:0.15rem;text-transform:uppercase;letter-spacing:0.05em}
+
+    /* ═══ STEPS ═══ */
+    .steps{display:flex;flex-direction:column;gap:0;position:relative;max-width:36rem;margin:0 auto}
+    .step{display:flex;align-items:flex-start;gap:1.25rem;position:relative;padding-bottom:2rem}
+    .step:last-child{padding-bottom:0}
+    .step:last-child .step-line{display:none}
+    .step-num{width:2.5rem;height:2.5rem;border-radius:var(--radius-full);background:var(--teal);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;font-family:var(--font-display)}
+    .step-line{position:absolute;left:1.25rem;top:2.5rem;bottom:0;width:2px;background:var(--border);transform:translateX(-50%)}
+    .step-content h4{font-size:1rem;font-weight:700;margin-bottom:0.2rem}
+    .step-content p{font-size:0.85rem;color:var(--slate-400);line-height:1.5}
+
+    /* ═══ COMPARISON TABLE ═══ */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden}
+    .comparison-table{width:100%;border-collapse:collapse}
+    .comparison-table th,.comparison-table td{padding:0.85rem 1.25rem;text-align:left;border-bottom:1px solid var(--border)}
+    .comparison-table tr:last-child td{border-bottom:none}
+    .comparison-table th{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-500);font-weight:600;background:rgba(255,255,255,0.02)}
+    .comparison-table td{font-size:0.9rem;color:var(--slate-300)}
+    .comparison-table .highlight{color:var(--teal-light);font-weight:700}
+    .comparison-table .highlight-row td{background:rgba(33,129,120,0.06)}
+    .fee-list{margin-top:1.5rem;display:flex;flex-direction:column;gap:0.6rem}
+    .fee-item{display:flex;align-items:center;gap:0.6rem;font-size:0.9rem;color:var(--slate-300)}
+    .fee-item svg{width:1rem;height:1rem;color:var(--teal-light);flex-shrink:0}
+
+    /* ═══ BADGES ═══ */
+    .badge-grid{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center}
+    .badge{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.65rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);transition:border-color 0.3s}
+    .badge:hover{border-color:var(--teal-border)}
+    .badge-name{font-weight:700;font-size:0.8rem;white-space:nowrap}
+    .badge-role{font-size:0.6rem;color:var(--slate-500);text-align:center;white-space:nowrap}
+
+    /* ═══ ARCHITECTURE ═══ */
+    .arch-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+    .arch-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.25rem;backdrop-filter:blur(8px)}
+    .arch-box h4{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--teal-light);margin-bottom:0.75rem;font-weight:700}
+    .arch-items{display:flex;flex-wrap:wrap;gap:0.5rem}
+    .arch-item{font-size:0.75rem;color:var(--slate-300);background:rgba(255,255,255,0.05);padding:0.3rem 0.6rem;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.06)}
+    .arch-divider{text-align:center;padding:1.5rem 0;position:relative}
+    .arch-divider::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--border)}
+    .arch-divider span{position:relative;background:var(--bg);padding:0 1rem;font-size:0.75rem;color:var(--slate-400);font-weight:600;text-transform:uppercase;letter-spacing:0.08em}
+    .arch-executors{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+    .arch-executor{text-align:center;padding:0.85rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);font-size:0.8rem;color:var(--slate-300);font-weight:500}
+
+    /* ═══ CTA SECTION ═══ */
+    #cta{position:relative;padding:5rem 0;overflow:hidden}
+    .bg-dots{position:absolute;inset:0;pointer-events:none;opacity:0.2;background-image:radial-gradient(rgba(255,255,255,0.12) 1px,transparent 1px);background-size:24px 24px}
+    #cta h2{font-size:2rem;margin-bottom:0.75rem}
+    .cta-sub{color:var(--slate-400);font-size:1rem;margin-bottom:2rem;max-width:32rem}
+
+    /* ═══ FOOTER ═══ */
+    footer{background:var(--bg-footer);border-top:1px solid var(--border);padding:3rem 0 1.5rem}
+    .footer-grid{display:grid;grid-template-columns:1fr;gap:2rem;margin-bottom:2rem}
+    .footer-brand{font-family:var(--font-display);font-weight:800;font-size:1.1rem;margin-bottom:0.5rem}
+    .footer-desc{font-size:0.8rem;color:var(--slate-500);line-height:1.6;max-width:20rem}
+    .footer-heading{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-500);font-weight:700;margin-bottom:0.75rem}
+    .footer-links{display:flex;flex-direction:column;gap:0.5rem}
+    .footer-links a{font-size:0.85rem;color:var(--slate-400);transition:color 0.2s}
+    .footer-links a:hover{color:var(--white)}
+    .footer-base-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 0.85rem;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--surface);font-size:0.7rem;font-weight:600;color:var(--slate-400)}
+    .footer-base-badge .dot{width:8px;height:8px;border-radius:50%;background:#0052FF}
+    .footer-bottom{border-top:1px solid var(--border);padding-top:1.5rem;font-size:0.75rem;color:var(--slate-500);text-align:center}
+
+    /* ═══ SCROLL ANIMATION ═══ */
+    @keyframes fade-slide-blur-in{
+      0%{opacity:0.01;transform:translateY(20px);filter:blur(4px)}
+      100%{opacity:1;transform:translateY(0);filter:blur(0)}
+    }
+    .animate-on-scroll{opacity:0.01}
+    .is-visible{animation:fade-slide-blur-in 0.8s var(--ease) forwards}
+
+    /* ═══ RESPONSIVE ═══ */
+    @media(min-width:640px){
+      :root{--px:1.5rem}
+      h1{font-size:3rem}
+      .hero-ctas{flex-direction:row}
+      .stats-bar{grid-template-columns:repeat(4,1fr)}
+    }
+    @media(min-width:768px){
+      .grid-2{grid-template-columns:repeat(2,1fr)}
+      .grid-3{grid-template-columns:repeat(2,1fr)}
+      .split{grid-template-columns:1fr 1fr}
+      .nav-links{display:flex}
+      .nav-cta-desktop{display:inline-flex}
+      .mobile-menu-btn{display:none}
+      .arch-grid{grid-template-columns:repeat(2,1fr)}
+      .footer-grid{grid-template-columns:2fr 1fr 1fr}
+      section{padding:5rem 0}
+    }
+    @media(min-width:1024px){
+      :root{--px:2rem}
+      h1{font-size:3.75rem}
+      h2{font-size:2.5rem}
+      .grid-3{grid-template-columns:repeat(3,1fr)}
+      section{padding:6rem 0}
+      #hero{padding:10rem 0 6rem}
+      #cta h2{font-size:2.5rem}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">Indie Protocol</a>
+      <div class="nav-links" id="navLinks">
+        <a href="#primitives">Primitives</a>
+        <a href="#lifecycle">Lifecycle</a>
+        <a href="#economics">Economics</a>
+        <a href="#use-cases">Use Cases</a>
+        <a href="#standards">Standards</a>
+      </div>
+      <a href="whitepaper/WHITEPAPER.md" class="btn btn-primary btn-sm nav-cta-desktop">Whitepaper</a>
+      <button class="mobile-menu-btn" id="menuBtn" aria-label="Toggle menu">
+        <i data-lucide="menu" id="menuIcon"></i>
+        <i data-lucide="x" id="closeIcon" style="display:none"></i>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#primitives">Primitives</a>
+      <a href="#lifecycle">Lifecycle</a>
+      <a href="#economics">Economics</a>
+      <a href="#use-cases">Use Cases</a>
+      <a href="#standards">Standards</a>
+      <a href="whitepaper/WHITEPAPER.md">Read Whitepaper</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ═══ HERO ═══ -->
+    <section id="hero">
+      <div class="bg-blueprint"></div>
+      <div class="bg-noise"></div>
+      <div class="bg-glow"></div>
+      <div class="container hero-content text-center">
+        <div class="animate-on-scroll">
+          <span class="pill"><span class="pill-dot"></span> Testnet &middot; Base Sepolia &middot; Open Protocol</span>
+          <h1 class="gradient-text">The Economic Layer<br>for Digital Services</h1>
+          <p class="hero-sub mx-auto">A general-purpose smart contract framework for service tokenization, marketplace, and billing. Executor-agnostic. Creator-first. Gasless by default.</p>
+          <div class="hero-ctas flex-center">
+            <a href="whitepaper/WHITEPAPER.md" class="btn btn-primary"><i data-lucide="file-text"></i> Read Whitepaper</a>
+            <a href="https://github.com/HostCoders/indieprotocol" class="btn btn-ghost" target="_blank" rel="noopener"><i data-lucide="github"></i> View on GitHub</a>
+          </div>
+        </div>
+        <div class="stats-bar animate-on-scroll" style="animation-delay:200ms">
+          <div class="stat">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Contracts</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">8</div>
+            <div class="stat-label">ERC Standards</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">1,000+</div>
+            <div class="stat-label">Tests</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">0%</div>
+            <div class="stat-label">Commission</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROBLEM ═══ -->
+    <section id="problem">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill">The Missing Layer</span>
+          <h2>Digital Services Deserve<br><span class="gradient-text">Better Infrastructure</span></h2>
+          <p class="section-sub">APIs, AI agents, automations, compute tasks, data pipelines &mdash; the backbone of the modern economy. Yet the infrastructure for owning, trading, and billing these services remains fragmented and centralized.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card animate-on-scroll" style="animation-delay:100ms">
+            <div class="card-icon"><i data-lucide="shield-off"></i></div>
+            <h3>No Ownership</h3>
+            <p>Services exist at the mercy of host platforms. There is no portable, verifiable ownership primitive for digital services.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:200ms">
+            <div class="card-icon"><i data-lucide="credit-card"></i></div>
+            <h3>Rigid Billing</h3>
+            <p>Forced into one model: monthly subscriptions or flat-rate APIs. No unified framework for per-execution, subscription, and purchase.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:300ms">
+            <div class="card-icon"><i data-lucide="globe"></i></div>
+            <h3>Siloed Discovery</h3>
+            <p>Services live in walled-garden marketplaces. No composability, no trustless service-to-service billing, no portability.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PRIMITIVES ═══ -->
+    <section id="primitives">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill"><span class="pill-dot"></span> Core Protocol</span>
+          <h2>Six Composable <span class="gradient-text">Primitives</span></h2>
+          <p class="section-sub">Each contract is independently useful. Use ServiceNFT without the Marketplace. Use inUSD without ServiceNFTs. Mix, match, and compose.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card animate-on-scroll" style="animation-delay:100ms">
+            <div class="card-icon"><i data-lucide="hexagon"></i></div>
+            <h3>ServiceNFT</h3>
+            <span class="card-tag">ERC-721 + ERC-5643</span>
+            <p>Tokenize any digital service as a transferable, ownable asset with native subscription billing.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:200ms">
+            <div class="card-icon"><i data-lucide="wallet"></i></div>
+            <h3>Token-Bound Accounts</h3>
+            <span class="card-tag">ERC-6551</span>
+            <p>Dedicated wallet per service instance. Fund once, execute many. Owner controls when idle.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:300ms">
+            <div class="card-icon"><i data-lucide="repeat"></i></div>
+            <h3>Three Billing Models</h3>
+            <span class="card-tag">Per-execution &middot; Subscription &middot; Purchase</span>
+            <p>Per-execution micropayments, 30-day subscriptions, and one-time purchases in a single contract.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:400ms">
+            <div class="card-icon"><i data-lucide="zap"></i></div>
+            <h3>Gasless Marketplace</h3>
+            <span class="card-tag">EIP-712 + EIP-3009 + ERC-4337</span>
+            <p>Register, list, purchase, and swap &mdash; all gasless. Users never need to hold ETH.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:500ms">
+            <div class="card-icon"><i data-lucide="dollar-sign"></i></div>
+            <h3>inUSD Payment Rails</h3>
+            <span class="card-tag">ERC-20 &middot; USDC-backed</span>
+            <p>Stable unit of account for all operations. Free entry from USDC. Ecosystem retention incentive.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:600ms">
+            <div class="card-icon"><i data-lucide="file-check"></i></div>
+            <h3>BillingExecutor</h3>
+            <span class="card-tag">On-chain audit trail</span>
+            <p>Batch settlement with immutable records. Per-creator and per-service analytics for reputation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ LIFECYCLE ═══ -->
+    <section id="lifecycle">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill">Service Lifecycle</span>
+          <h2>From Registration to <span class="gradient-text">Settlement</span></h2>
+          <p class="section-sub">Five phases, all gasless for end users. The protocol handles ownership, discovery, billing, and settlement.</p>
+        </div>
+        <div class="steps animate-on-scroll" style="animation-delay:200ms">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-line"></div>
+            <div class="step-content">
+              <h4>Register</h4>
+              <p>Creator signs EIP-712 message. ServiceFactory deploys a new ServiceNFT contract with immutable pricing. Zero gas for creator.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-line"></div>
+            <div class="step-content">
+              <h4>List</h4>
+              <p>Creator burns a Listing Pass. Service becomes discoverable on the marketplace. Optional Feature Pass boosting.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-line"></div>
+            <div class="step-content">
+              <h4>Purchase</h4>
+              <p>Buyer signs a gasless authorization. inUSD transfers directly to creator with zero commission. ERC-721 instance minted to buyer.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-line"></div>
+            <div class="step-content">
+              <h4>Fund &amp; Execute</h4>
+              <p>Buyer deposits inUSD to the Token-Bound Account. Instance locks. Executor draws per-execution fees to creator.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <h4>Settle</h4>
+              <p>BillingExecutor records batch statistics on-chain. Immutable audit trail. Per-creator and per-service analytics update.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ ECONOMICS ═══ -->
+    <section id="economics">
+      <div class="container">
+        <div class="text-center animate-on-scroll">
+          <span class="pill"><span class="pill-dot"></span> Token Economics</span>
+          <h2>Creator-First. <span class="gradient-text">Minimal Extraction.</span></h2>
+          <p class="section-sub">Zero commission on service revenue. Creators keep execution, purchase, and subscription payments in full. The protocol sustains itself through a 10% exit fee on USDC withdrawals and flat per-execution micro-fees ($0.0001).</p>
+        </div>
+        <div class="split">
+          <div class="animate-on-scroll" style="animation-delay:100ms">
+            <h3 style="margin-bottom:1rem">How Revenue Flows</h3>
+            <p style="color:var(--slate-400);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem">Service purchase price, execution fees, and subscription payments flow directly from buyer to creator. The protocol never intermediates or takes a commission on service revenue.</p>
+            <div class="fee-list">
+              <div class="fee-item"><i data-lucide="check-circle"></i> <span><strong style="color:var(--white)">0% fee</strong> to enter &mdash; USDC to inUSD at 1:1</span></div>
+              <div class="fee-item"><i data-lucide="check-circle"></i> <span><strong style="color:var(--white)">0% fee</strong> to spend inUSD on services</span></div>
+              <div class="fee-item"><i data-lucide="check-circle"></i> <span><strong style="color:var(--white)">$0.0001</strong> flat execution micro-fee</span></div>
+              <div class="fee-item"><i data-lucide="alert-circle"></i> <span><strong style="color:var(--white)">10% fee</strong> only on exit (inUSD to USDC)</span></div>
+            </div>
+          </div>
+          <div class="animate-on-scroll" style="animation-delay:250ms">
+            <div class="table-wrap">
+              <table class="comparison-table">
+                <thead>
+                  <tr><th>Platform</th><th>Commission</th><th>Settlement</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Apple App Store</td><td>30%</td><td>Monthly</td></tr>
+                  <tr><td>Stripe</td><td>2.9% + $0.30</td><td>2 days</td></tr>
+                  <tr><td>RapidAPI</td><td>20%</td><td>Monthly</td></tr>
+                  <tr class="highlight-row"><td class="highlight">Indie Protocol</td><td class="highlight">0%</td><td class="highlight">5-min batch</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ USE CASES ═══ -->
+    <section id="use-cases">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill">Use Cases</span>
+          <h2>One Protocol, <span class="gradient-text">Many Markets</span></h2>
+          <p class="section-sub">The protocol is executor-agnostic. Any digital service that can report execution events can plug into the Indie Protocol.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card animate-on-scroll" style="animation-delay:100ms">
+            <div class="card-icon"><i data-lucide="bot"></i></div>
+            <h3>AI Agent Marketplace</h3>
+            <p>Tokenize LLM agents as NFTs with per-inference billing. Circuit breaker protects against runaway costs.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:200ms">
+            <div class="card-icon"><i data-lucide="code"></i></div>
+            <h3>API Monetization</h3>
+            <p>Replace Stripe + API keys with on-chain ownership and TBA-based credit. No chargebacks, no invoices.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:300ms">
+            <div class="card-icon"><i data-lucide="git-branch"></i></div>
+            <h3>Workflow Automation</h3>
+            <p>Sell automation templates as NFT products. Per-run billing with composable workflow-to-workflow calls.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:400ms">
+            <div class="card-icon"><i data-lucide="server"></i></div>
+            <h3>Compute &amp; GPU</h3>
+            <p>Per-job billing in dollar-stable inUSD. maxExecutionPrice prevents bill shock on expensive jobs.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:500ms">
+            <div class="card-icon"><i data-lucide="database"></i></div>
+            <h3>Data Feeds</h3>
+            <p>Subscription-native feeds with on-chain delivery records as verifiable reliability metrics.</p>
+          </div>
+          <div class="card animate-on-scroll" style="animation-delay:600ms">
+            <div class="card-icon"><i data-lucide="link"></i></div>
+            <h3>Service-to-Service</h3>
+            <p>Machine-to-machine billing via ERC-8004 discovery and TBA-to-TBA payments. Full audit trail.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ STANDARDS ═══ -->
+    <section id="standards">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill"><span class="pill-dot"></span> Interoperability</span>
+          <h2>Built on Established <span class="gradient-text">Standards</span></h2>
+          <p class="section-sub">10 Ethereum standards ensure maximum composability with the broader EVM ecosystem. Service instances are real NFTs, tradeable on any marketplace.</p>
+        </div>
+        <div class="badge-grid animate-on-scroll" style="animation-delay:200ms">
+          <div class="badge"><span class="badge-name">ERC-20</span><span class="badge-role">inUSD Stablecoin</span></div>
+          <div class="badge"><span class="badge-name">ERC-721</span><span class="badge-role">Service Ownership</span></div>
+          <div class="badge"><span class="badge-name">ERC-1155</span><span class="badge-role">Access Passes</span></div>
+          <div class="badge"><span class="badge-name">ERC-5643</span><span class="badge-role">Subscriptions</span></div>
+          <div class="badge"><span class="badge-name">ERC-6551</span><span class="badge-role">Agent Wallets</span></div>
+          <div class="badge"><span class="badge-name">ERC-8004</span><span class="badge-role">Agent Identity</span></div>
+          <div class="badge"><span class="badge-name">EIP-712</span><span class="badge-role">Typed Signing</span></div>
+          <div class="badge"><span class="badge-name">EIP-3009</span><span class="badge-role">Gasless Transfers</span></div>
+          <div class="badge"><span class="badge-name">EIP-4337</span><span class="badge-role">Account Abstraction</span></div>
+          <div class="badge"><span class="badge-name">x402</span><span class="badge-role">HTTP Payments</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ ARCHITECTURE ═══ -->
+    <section id="architecture">
+      <div class="container text-center">
+        <div class="animate-on-scroll">
+          <span class="pill">Architecture</span>
+          <h2>Contract <span class="gradient-text">Architecture</span></h2>
+          <p class="section-sub">12 production contracts organized into four functional layers. All contracts read dependencies from PlatformConfig &mdash; the single source of truth.</p>
+        </div>
+        <div class="animate-on-scroll" style="animation-delay:200ms">
+          <div class="arch-grid">
+            <div class="arch-box">
+              <h4>Service Layer</h4>
+              <div class="arch-items">
+                <span class="arch-item">ServiceNFT</span>
+                <span class="arch-item">ServiceFactory</span>
+                <span class="arch-item">ServiceRegistry</span>
+              </div>
+            </div>
+            <div class="arch-box">
+              <h4>Marketplace Layer</h4>
+              <div class="arch-items">
+                <span class="arch-item">Marketplace</span>
+                <span class="arch-item">ServicePass</span>
+                <span class="arch-item">ServiceAccountImpl</span>
+              </div>
+            </div>
+            <div class="arch-box">
+              <h4>Payment Layer</h4>
+              <div class="arch-items">
+                <span class="arch-item">InUSDToken</span>
+                <span class="arch-item">InUSDCTreasury</span>
+                <span class="arch-item">TokenExchange</span>
+              </div>
+            </div>
+            <div class="arch-box">
+              <h4>Infrastructure</h4>
+              <div class="arch-items">
+                <span class="arch-item">PlatformConfig</span>
+                <span class="arch-item">BillingExecutor</span>
+                <span class="arch-item">X402Receiver</span>
+              </div>
+            </div>
+          </div>
+          <div class="arch-divider"><span>Executor-Agnostic Interface</span></div>
+          <div class="arch-executors">
+            <div class="arch-executor"><i data-lucide="bot" style="width:16px;height:16px;margin:0 auto 4px;display:block;color:var(--teal-light)"></i>AI Agents</div>
+            <div class="arch-executor"><i data-lucide="git-branch" style="width:16px;height:16px;margin:0 auto 4px;display:block;color:var(--teal-light)"></i>Workflow Engines</div>
+            <div class="arch-executor"><i data-lucide="code" style="width:16px;height:16px;margin:0 auto 4px;display:block;color:var(--teal-light)"></i>API Gateways</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CTA ═══ -->
+    <section id="cta">
+      <div class="bg-dots"></div>
+      <div class="container text-center" style="position:relative;z-index:2">
+        <div class="animate-on-scroll">
+          <h2>Start Building on the<br><span class="gradient-text">Indie Protocol</span></h2>
+          <p class="cta-sub mx-auto">Read the whitepaper to understand the full architecture, economics, and security model. Then explore the contracts.</p>
+          <div class="hero-ctas flex-center">
+            <a href="whitepaper/WHITEPAPER.md" class="btn btn-primary"><i data-lucide="file-text"></i> Read the Whitepaper</a>
+            <a href="https://github.com/HostCoders/indieprotocol" class="btn btn-ghost" target="_blank" rel="noopener"><i data-lucide="github"></i> View on GitHub</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Indie Protocol</div>
+          <p class="footer-desc">A general-purpose smart contract framework for service tokenization, marketplace, and billing on EVM chains.</p>
+        </div>
+        <div>
+          <div class="footer-heading">Resources</div>
+          <div class="footer-links">
+            <a href="whitepaper/WHITEPAPER.md">Whitepaper</a>
+            <a href="#architecture">Architecture</a>
+            <a href="whitepaper/WHITEPAPER.md">Use Cases</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-heading">Protocol</div>
+          <div class="footer-links">
+            <a href="#primitives">Primitives</a>
+            <a href="#economics">Economics</a>
+            <a href="#standards">Standards</a>
+            <a href="#lifecycle">Lifecycle</a>
+          </div>
+          <div style="margin-top:1.25rem">
+            <span class="footer-base-badge"><span class="dot"></span> Built on Base</span>
+          </div>
+          <div style="margin-top:0.75rem">
+            <span class="footer-base-badge"><span class="dot" style="background:#10b981"></span> First executor integration live</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Indie Protocol. All rights reserved. Solidity 0.8.20 &middot; OpenZeppelin v5 &middot; Base Sepolia Testnet
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ JAVASCRIPT ═══ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Init Lucide icons
+      lucide.createIcons();
+
+      // Navbar scroll effect
+      var navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 20) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+
+      // Mobile menu toggle
+      var menuBtn = document.getElementById('menuBtn');
+      var mobileMenu = document.getElementById('mobileMenu');
+      var menuIcon = document.getElementById('menuIcon');
+      var closeIcon = document.getElementById('closeIcon');
+
+      menuBtn.addEventListener('click', function() {
+        var isOpen = mobileMenu.classList.toggle('open');
+        menuIcon.style.display = isOpen ? 'none' : 'block';
+        closeIcon.style.display = isOpen ? 'block' : 'none';
+      });
+
+      // Close mobile menu on link click
+      mobileMenu.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          mobileMenu.classList.remove('open');
+          menuIcon.style.display = 'block';
+          closeIcon.style.display = 'none';
+        });
+      });
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href === '#') return;
+          e.preventDefault();
+          var target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // IntersectionObserver for scroll animations
+      var observer = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      );
+
+      document.querySelectorAll('.animate-on-scroll').forEach(function(el) {
+        observer.observe(el);
+      });
+    });
+  </script>
+
+</body>
+</html>
